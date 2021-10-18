@@ -1,4 +1,216 @@
-<hello name="{{ name }}"></hello>
-<p>
-  Start editing to see some magic happen :)
-</p>
+<div class="col-lg-7 mx-auto text-center">
+  <img class="img img-fluid logo" src="assets/wavesurferrxjs.png" />
+  <h1>WaveSurfer<i>Rx</i>JS</h1>
+  <p class="lead mb-4">
+    Angular service that provides RxJS observables for most of the standard
+    WaveSurfer.js events, plus other useful observables.
+  </p>
+</div>
+<div class="container">
+  <div id="basetemplate"></div>
+  <div class="row">
+    <div class="col-4">
+      <div class="btn-group">
+        <button
+          class="btn btn-secondary"
+          [ngClass]="{ 'btn-active': waveSurferRxJS.isPlaying$ | async }"
+          (click)="waveSurferService.WaveSurfer.play()"
+        >
+          Play
+        </button>
+        <button
+          class="btn btn-secondary"
+          [ngClass]="{
+            'btn-active': (waveSurferRxJS.playbackState$ | async) == 'paused'
+          }"
+          (click)="waveSurferService.WaveSurfer.pause()"
+        >
+          Pause
+        </button>
+        <button class="btn btn-secondary" (click)="stop()">|<<</button>
+        <button
+          class="btn btn-secondary"
+          [ngClass]="{ 'btn-active': waveSurferRxJS.mute$ | async }"
+          (click)="waveSurferService.WaveSurfer.toggleMute()"
+        >
+          Mute
+        </button>
+      </div>
+    </div>
+    <div class="col-5 volcol">
+      <span>Volume</span>
+      <input
+        #volume
+        (change)="waveSurferService.WaveSurfer.setVolume(volume.value / 100)"
+        type="range"
+        class="form-range"
+        min="0"
+        max="100"
+        id="volume"
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <table>
+        <tr>
+          <td><b>audioprocess</b></td>
+          <td><small>Fires continuously while playing.</small></td>
+          <td><pre>audioprocess$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.audioprocess$ | async }}</pre>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>finish</b>
+          </td>
+          <td><small>When it finishes playing. </small></td>
+          <td><pre>finish$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.finish$ | async }}</pre>
+          </td>
+        </tr>
+        <!-- <tr>
+    <td>
+      <b>interaction</b>
+    </td>
+    <td><small> When there's interaction with the waveform. </small></td>
+    <td><pre>$interaction</pre></td>
+    <td><pre>{{ waveSurferRxJS.interaction$ | async }}</pre></td>
+  </tr> -->
+        <tr>
+          <td>
+            <b>loading</b>
+          </td>
+          <td>
+            <small>
+              Fires continuously when loading using fetch or drag'n'drop.</small
+            >
+          </td>
+          <td><pre>loading$[0]</pre></td>
+          <td>
+            <pre>{{ (waveSurferRxJS.loading$ | async) }}</pre>
+          </td>
+        </tr>
+
+        <tr>
+          <td><b>mute</b></td>
+          <td>
+            <small
+              >On mute change. Callback will receive (boolean) new mute
+              status.</small
+            >
+          </td>
+          <td><pre>mute$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.mute$ | async }}</pre>
+          </td>
+        </tr>
+
+        <tr>
+          <td><b>pause</b></td>
+          <td><small>When audio is paused.</small></td>
+          <td><pre>pause$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.pause$ | async }}</pre>
+          </td>
+        </tr>
+
+        <tr>
+          <td><b>play</b></td>
+          <td><small>When playback starts. </small></td>
+          <td><pre>play$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.play$ | async }}</pre>
+          </td>
+        </tr>
+
+        <tr>
+          <td><b>ready</b></td>
+          <td>
+            <small>When audio is loaded, decoded and the waveform drawn.</small>
+          </td>
+          <td><pre>ready$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.ready$ | async }}</pre>
+          </td>
+        </tr>
+
+        <tr>
+          <td><b>scroll</b></td>
+          <td>
+            <small
+              >When the scrollbar is moved. Callback will receive a ScrollEvent
+              object.</small
+            >
+          </td>
+          <td><pre>scroll$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.scroll$ | async }}</pre>
+          </td>
+        </tr>
+
+        <tr>
+          <td><b>seek</b></td>
+          <td>
+            <small
+              >On seeking. Callback will receive (float) progress [0..1].</small
+            >
+          </td>
+          <td><pre>seek$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.seek$ | async }}</pre>
+          </td>
+        </tr>
+
+        <tr>
+          <td><b>volume</b></td>
+          <td>
+            <small
+              >On volume change. Callback will receive (integer) new volume.
+            </small>
+          </td>
+          <td><pre>volume$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.volume$ | async }}</pre>
+          </td>
+        </tr>
+
+        <tr style="border-top: 3px solid rgba(0, 255, 255, 1)">
+          <td><b>currentTime</b></td>
+          <td>
+            <small
+              >Observable that returns the current playback time every 1/10th of
+              a second.
+            </small>
+          </td>
+          <td><pre>currentTime$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.currentTime$ | async }}</pre>
+          </td>
+        </tr>
+        <tr>
+          <td><b>isPlaying</b></td>
+          <td>
+            <small>Emits whether or not the media is currently playing. </small>
+          </td>
+          <td><pre>isPlaying$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.isPlaying$ | async }}</pre>
+          </td>
+        </tr>
+        <tr>
+          <td><b>playbackState</b></td>
+          <td>
+            <small>Will emit 'playing', 'paused' or 'stopped'. </small>
+          </td>
+          <td><pre>playbackState$</pre></td>
+          <td>
+            <pre>{{ waveSurferRxJS.playbackState$ | async }}</pre>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
